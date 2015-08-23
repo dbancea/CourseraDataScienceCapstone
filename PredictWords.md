@@ -2,7 +2,7 @@ Predicting next word(s)
 Coursera Data Science Capstone project
 ========================================================
 author: Danut Bancea
-date: Sun Aug 23 11:07:17 2015 
+date: Sun Aug 23 11:21:47 2015 
 
 Introduction
 ========================================================
@@ -38,7 +38,7 @@ The source code it is also displayed and it can be moved bellow the aplication s
 References and additional information
 ========================================================
 
-- The source code and all the files are available on github at 
+- The source code and all the files are available on github [https://github.com/dbancea/CourseraDataScienceCapstone]
 
 - Link for the shiny application  [https://bancea.shinyapps.io/DataScienceCapstone]
 
