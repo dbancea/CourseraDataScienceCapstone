@@ -1,0 +1,85 @@
+
+library(knitr);
+library(NLP);
+library(tm);
+library(tau);
+library(slam);
+library(RColorBrewer);
+library(wordcloud);
+library(SnowballC);
+
+setwd("D:\\cursuri\\DataScienceCapstone\\q03\\f");
+
+files_list <- list.files();
+SampleSize <- 0.25;
+for (file_name in files_list) {
+   file_con <- file(file_name, "rb");
+   f_lines <- readLines(file_con, encoding="UTF-8", skipNul=TRUE);
+   f_sample_lines <-  sample(f_lines, length(f_lines)*SampleSize);
+   f_tmp <- gsub("[^[:print:]]","",f_sample_lines);
+   f_tmp2 <- gsub("?|!+|\\.+|;|#|&","",f_tmp);
+   f_tmp <- gsub("\\|\\/", " ", f_tmp2);
+   f_corpus <- gsub(":\\)|\\(:|;\\)|\\(;", "", f_tmp);
+   doc_vs <- VectorSource(f_corpus);
+   close(file_con);
+}
+
+
+docs <- Corpus(doc_vs);
+rm(f_lines);
+rm(f_sample_lines);
+rm(f_corpus);
+
+docs <- tm_map(docs, content_transformer(tolower));
+docs <- tm_map(docs, removeNumbers);
+docs <- tm_map(docs, stripWhitespace);
+
+
+grams3 <- function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE);
+tdm_3grams <- TermDocumentMatrix(docs, control = list(tokenize = grams3, bounds = list(global = c(1,Inf))));
+tdm_3gram_r <- rollup(tdm_3grams, 2, na.rm=TRUE, FUN = sum);
+tdm_3gram_Freq <- sort((as.matrix(tdm_3gram_r)[,1]),decreasing=TRUE);
+t3g <- data.frame(words=names(tdm_3gram_Freq), freq=tdm_3gram_Freq, stringsAsFactors = FALSE);
+t3 <- subset(t3g, freq > 3);
+n3 <- rownames(t3);
+
+
+grams4 <- function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE);
+tdm_4grams <- TermDocumentMatrix(docs, control = list(tokenize = grams4, bounds = list(global = c(1,Inf))));
+tdm_4gram_r <- rollup(tdm_4grams, 2, na.rm=TRUE, FUN = sum);
+tdm_4gram_Freq <- sort((as.matrix(tdm_4gram_r)[,1]),decreasing=TRUE);
+t4g <- data.frame(words=names(tdm_4gram_Freq), freq=tdm_4gram_Freq, stringsAsFactors = FALSE);
+t4 <- subset(t4g, freq > 3);
+n4 <- rownames(t4);
+
+
+tdm_1gram <- TermDocumentMatrix(docs);
+tdm_1gram_r <- rollup(tdm_1gram, 2, na.rm=TRUE, FUN = sum);
+tdm_1gram_Freq <- sort((as.matrix(tdm_1gram_r)[,1]),decreasing=TRUE);
+t1g <- data.frame(words=names(tdm_1gram_Freq), freq=tdm_1gram_Freq, stringsAsFactors = FALSE);
+t1 <- subset(t1g, freq > 3);
+n1 <- rownames(t1);
+
+grams2 <- function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE);
+tdm_2grams <- TermDocumentMatrix(docs, control = list(tokenize = grams2, bounds = list(global = c(1,Inf))));
+tdm_2gram_r <- rollup(tdm_2grams, 2, na.rm=TRUE, FUN = sum);
+tdm_2gram_Freq <- sort((as.matrix(tdm_2gram_r)[,1]),decreasing=TRUE);
+t2g <- data.frame(words=names(tdm_2gram_Freq), freq=tdm_2gram_Freq, stringsAsFactors = FALSE);
+t2 <- subset(t2g, freq > 3);
+n2 <- rownames(t2);
+
+
+save(list=c('t3','n3'), file="three.Rda");
+save(list=c('t4','n4'), file="four.Rda");
+save(list=c('t2','n2'), file="two.Rda");
+save(list=c('t1','n1'), file="one.Rda");
+
+
+save("t3g", file="t3g.Rda");
+save("t4g", file="t4g.Rda");
+save("t2g", file="t2g.Rda");
+save("t1g", file="t1g.Rda");
+
+
+
+
